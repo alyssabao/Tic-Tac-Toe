@@ -12,6 +12,8 @@ export default class Board extends Component {
     }
 
     boxClick = (id) => {
+        let currentPointer = this.props.current;
+        currentPointer ++;
         if (this.calculateWinner(this.props.squares) || this.props.squares[id]) {
             return;
         }
@@ -20,9 +22,10 @@ export default class Board extends Component {
         console.log("square you got so far is:", squaresFromApp)
         squaresFromApp[id] = this.props.isXNext?'X':'O'
         console.log("after change:", squaresFromApp)
+        let cutHistory = this.props.history.slice(0,currentPointer)
         // let array = this.props.history.slice()
         // array=array.concat({squares:squaresFromApp.slice(), isXNext:!this.props.isXNext})
-        this.props.setTheState({squares:squaresFromApp, isXNext:!this.props.isXNext,history:[...this.props.history.slice(),{squares:squaresFromApp.slice(), isXNext:!this.props.isXNext}]})
+        this.props.setTheState({squares:squaresFromApp.slice(), isXNext:!this.props.isXNext,history:[...cutHistory,{squares:squaresFromApp.slice(), isXNext:!this.props.isXNext}], current: currentPointer})
     }
 
     calculateWinner = (squares) => {

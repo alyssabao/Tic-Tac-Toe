@@ -9,7 +9,8 @@ export default class App extends Component {
       squares:Array(9).fill(null),
       isXNext: true,
       stepNumber: 0,
-      history: []
+      history: [],
+      current:0
     }
   }
 
@@ -20,8 +21,10 @@ export default class App extends Component {
   timeTravel = (id) => {
     let newHistory = this.state.history.slice()
     this.setState ({
-      squares: newHistory[id].squares,
-      history: newHistory
+      squares: newHistory[id].squares.slice(),
+      history: newHistory,
+      isXNext: newHistory[id].isXNext,
+      current: id
     })
   }
 
