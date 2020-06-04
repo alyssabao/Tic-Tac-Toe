@@ -2,7 +2,16 @@ import React, { Component } from 'react'
 import Square from './Square.js'
 import Square2 from './Square2.js'
 
+let startTime = 0
+let endTime = 0
+
 export default class Board extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            status: ''
+        }
+    }
     renderSquare = (num) => {
         return <Square id={num} boxClick={this.boxClick} value={this.props.squares[num]} />
     }
@@ -20,11 +29,25 @@ export default class Board extends Component {
         console.log("You clicked box", id)
         let squaresFromApp = this.props.squares
         console.log("square you got so far is:", squaresFromApp)
+        if(squaresFromApp.every(item => item === null)) {
+            startTime = Date.now()
+            console.log("ddd", startTime)
+        }
         squaresFromApp[id] = this.props.isXNext ? 'X' : 'O'
+        const winner = this.calculateWinner(this.props.squares);
+        if (winner) {
+            this.setState({status: 'Winner: ' + winner});
+            endTime = Date.now()
+            let duration = Math.floor((endTime - startTime)/1000)
+            this.postData(duration)
+            this.props.getData()
+            } else if (this.props.squares.every(item => item!==null)) {
+                this.setState({status:`It's a draw!`})
+        } else {
+            this.setState({status:`Next Player: ${this.props.isXNext ? 'X' : 'O'}`})
+        }
         console.log("after change:", squaresFromApp)
         let cutHistory = this.props.history.slice(0, currentPointer)
-        // let array = this.props.history.slice()
-        // array=array.concat({squares:squaresFromApp.slice(), isXNext:!this.props.isXNext})
         this.props.setTheState({ squares: squaresFromApp.slice(), isXNext: !this.props.isXNext, history: [...cutHistory, { squares: squaresFromApp.slice(), isXNext: !this.props.isXNext }], current: currentPointer })
     }
 
@@ -48,11 +71,12 @@ export default class Board extends Component {
         return null;
     }
 
-    postData = async() => {
+    postData = async(duration) => {
         let data = new URLSearchParams();
-        data.append("player", "PLAYER_NAME");
-        data.append("score", "TIME_ELAPSED_IN_SECONDS");
-        const url = `http://ftw-highscores.herokuapp.com/tictactoe-dev`;
+        data.append("player", this.props.user);
+        data.append("score", duration);
+        console.log("aaa",this.props.user,"bbb",this.props.time)
+        const url = `https://ftw-highscores.herokuapp.com/tictactoe-dev`;
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -64,21 +88,23 @@ export default class Board extends Component {
     }
 
     render() {
-        const winner = this.calculateWinner(this.props.squares);
-        let status;
-        if (winner) {
-            status = 'Winner: ' + winner;
-            this.postData()
-            } else if (this.props.squares.every(item => item!==null)) {
-                status = `It's a draw!`
-        } else {
-            status = `Next Player: ${this.props.isXNext ? 'X' : 'O'}`
-        }
+        // const winner = this.calculateWinner(this.props.squares);
+        // let status;
+        // if (winner) {
+        //     status = 'Winner: ' + winner;
+        //     endTime = Date.now()
+        //     let duration = Math.floor((endTime - startTime)/1000)
+        //     this.postData(duration)
+        //     } else if (this.props.squares.every(item => item!==null)) {
+        //         status = `It's a draw!`
+        // } else {
+        //     status = `Next Player: ${this.props.isXNext ? 'X' : 'O'}`
+        // }
         return (
             <div className="centerFormat">
                 <h1>Tic Tac Toe</h1>
                 <h2>User: {this.props.user}</h2>
-                <h2>{status}</h2>
+                <h2>{this.state.status}</h2>
                 <div className="row">
                     {this.renderSquare(0)}
                     {this.renderSquare2(1)}

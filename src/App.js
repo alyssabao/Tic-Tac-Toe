@@ -14,7 +14,8 @@ export default class App extends Component {
       history: [],
       current: 0,
       topRank: [],
-      user: null
+      user: null,
+      time: 0
     }
   }
 
@@ -71,7 +72,7 @@ export default class App extends Component {
     }
     return (
       <div className="bg">
-        <Board {...this.state} setTheState={this.setTheState}/>
+        <Board {...this.state} setTheState={this.setTheState} getData={this.getData}/>
         {console.log("jjjj", this.state.history)}
         <div className="historyFormat">
           <h2>History</h2>
